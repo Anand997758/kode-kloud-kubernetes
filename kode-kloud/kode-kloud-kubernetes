@@ -1,0 +1,353 @@
+
+Crashloop backoff:
+First we have to check the pod and status and describe the pod why it is came crashloop backoff error
+The error is Backoff restarting failed container
+A)some errors in container side
+Like we are passing any wrong information it will come crashloopbackoff eoor
+Nodeselecters:
+Kubectl label nodes node1
+NodeAfinity:
+Types:
+1.requiredDuringSchedulingIgnoreDuringExecution
+ 2.PreferedDuringSchedulingIgnoreDuringExecution
+Planned:
+requiredDuringSchedulingRequiredDuringExecution
+Deployment objects:
+Kind:			version:
+Pod			v1
+Service		v1
+Replicaset		apps/v1
+Deomenset		apps/v1
+
+Vi pod.yaml
+Apiversion: apps/v1
+Kind: pod
+Metadata:
+  Name: apache
+  Namespace: apache
+    Labels:
+      Name: my-app
+      Type: frontend
+Spec:
+  Containers:
+Name: apache-server
+Image: apache	
+
+Kubectl apply -f pod.yaml
+
+Kubectl get pods
+Kubectl describe pod podid
+
+How to edit (or) changed in side yaml files command ?
+Command: kubectl edit pod podname\
+
+If you are not given a pod definition file, you may extract the definition to a file using the below command:
+command:kubectl get pod <pod-name> -o yaml > pod-definition.yaml
+Vi replication controller 
+apiVersion: v1
+Kind: replication controller
+Metadata:
+  Name: replicaset
+    Labels: 
+      Name: my-app
+      Type: replicaset
+Spec:
+  Template:
+    Metadata:
+      Name: apache-server
+        Labels: 
+          Name: apache-server
+Spec:
+  Containers:
+    - Name: apache-server
+	  Image: httpd
+  Replicas: 3
+ 
+Vi replicaset
+Vi replication controller 
+apiVersion: v1
+Kind: replication controller
+Metadata:
+  Name: replicaset
+    Labels: 
+      Name: my-app
+      Type: replicaset
+Spec:
+  Template:
+    Metadata:
+      Name: apache-server
+        Labels: 
+          Name: apache-server
+Spec:
+  Containers:
+    - Name: apache-server
+	  Image: httpd
+  Replicaset: 3
+  Srs:
+    matchLabels:
+    Type: frontend
+Remote taint in nodes:
+Kubectl taint node nodename taintname-
+Imperative commands:
+Command: kubectl taint node nodename app = blue:no schedule
+Talaration:
+key: “app”
+Operator: “equal”
+	Value: “blue”
+	Effect: no schedule
+#describe master
+Taint related:
+Kubectl describe node kubemaster | grep taint
+kubectl describe node node01 | grep -i taints
+kubectl taint node node01 spray=mortein:NoSchedule
+kubectl label node node01 color=blue
+kubectl create deployment blue --image=nginx --replicas=3
+Command: kubectl replace -f replicaset-defination.yaml
+Command: kubectl scale –replica=6 -f replicset-defination.yaml
+Command: kubectl get replicasets
+Command: kubectl describe deployment.apps frontend-deployment | grep -i image
+Command: kubectl create deployment httpd-frontend –image=httpd:2.4-alphine
+Command: kubectl scale deployment –replicas=3 httpd-frontend
+mount
+#it will come Which namespace has the blue pod in it?
+Command:
+  “Sleep” “500”
+#How to find the user used in specific pod in kubernetes: 
+Kubectl exec podname – whoami
+Command: kubectl get pods –all-namespaces
+Command: kubectl get service --namespace=marketing
+Command: kubectl get ns - -no-headers | wc -l
+Command: kubectl -n research get pods –no-headers
+Command: kubectl create deployment webapp –image=imgename –replicas=3
+Command: kubectl run nginx –image=image-nginx –port=80 –expose
+Kubectl get pods -A
+Kubectl get pods -all-namespaces | grep blue
+Kubectl replace –force -f /tmp/kubectl-edit.yaml
+Kubectl get pods podename -o yaml > pod.yaml
+Kubectl get pods –selector env=dev –no-headers | wc -l
+Kubectl rollout status deployment/myapp-deployment
+Kubectl rollout history deployment/myapp-deployment
+Whenever we have to use rollout command, new deployment will down and old deployment will be up to rollback. This is called also rollback  
+Kubectl rollout undo deployment/myapp-deployment
+Kubectl rollout status deployment/myapp-deployment
+echo -n 'anand'  | base64
+#to see all related labels and selectors, and annotations use this commands:
+kubectl get pods --selector env=dev
+Kubectl annotate pod/frontend contact=”trie tree”
+Kubectl get pods -o yaml | grep -c 3 ‘annotations’
+Kubectl run frontend - -image=nginx - - restart=Never - - labels=env=prod,team=admin
+Kubectl get pods - - show-labels
+Kubectl get pods -l ‘team in (dev, admin)’, env=prod - - show=labels
+Kubectl label pods frontend env-
+To see the all objects in prod environment use this command:
+kubectl get all --selector env=prod
+Identify the POD which is part of the prod environment, the finance BU and of frontend tier?
+kubectl get all --selector env=prod,bu=finance,tier=frontend
+Networking policy:
+apiVersion: networking.k8s/v1
+Kind: NetworkPolicy
+metadata:
+  name: db-policy
+spec:
+  podSelector: 
+    matchLabels:
+    role: db
+policyTypes:
+- Ingress
+- Egress
+ingress:
+- from:
+  - podSelector:
+        matchLabels:
+          name: api-pod
+    namespaceSelector:
+        matchLabels:
+          name: prod
+  ports:
+  - protocol: TCP
+    port: 3306
+egress:
+- to:
+  - ipBlock:
+        cidr: 192.34.2.53/32
+  ports:
+  - protocol: TCP
+    port: 80
+ 
+Ex: labels, and selectors in yamlfile
+apiVersion: apps/v1
+kind: ReplicaSet
+metadata:
+   name: replicaset-1
+spec:
+   replicas: 2
+   selector:
+      matchLabels:
+        tier: front-end
+   template:
+     metadata:
+       labels:
+        tier: front-end
+     spec:
+       containers:
+       - name: nginx
+         image: nginx
+ 
+Crictl pods
+Ps aux | grep kube-api
+Kubectl get secrets –all-namespaces -o json | kubectl replace -f -
+Encrypt data in etcd:
+Yum install etcd-client
+ETCDCTL_API=3 etcdctl \
+ 
+  --cacert=/etc/kubernetes/pki/etcd/ca.crt   \
+ 
+  --cert=/etc/kubernetes/pki/etcd/server.crt \
+ 
+  --key=/etc/kubernetes/pki/etcd/server.key  \
+ 
+  get /registry/secrets/default/secret1 | hexdump -C
+ 
+#Use that pvc in pods configuration
+apiVersion: apps/v1
+kind: Deployment
+metadata: 
+  name: apache
+spec:
+  containers: 
+    - name: apache
+      image: httpd
+      volumeMounts:
+      - mountpath: "/var/www/html"
+ 
+ volumes:
+    PersistentVolumeClaim:
+      claintName: pvc#pvc
+apiVersion: v1
+kind: pvc
+metadata:
+  - name: pvc
+spec:
+  storageClassName: manual
+  volumeMode: FileSystem
+  accessModes: 
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi
+#pv
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: mypv
+spec:
+  capacity:
+    storage: <Size>
+  volumeMode: Filesystem
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Recycle
+  storageClassName: slow
+  mountOptions:
+    - hard
+    - nfsvers=4.1
+  nfs:
+    path: /tmp
+    server: 172.17.0.2
+ 
+  
+	      
+In configmap we can store the credentials and values like database related username and passwd
+ 
+#To create imperative configmap
+Kubectl create configmap
+Kubectl get configmap
+#to create declarative configmap
+Vi config.yaml
+apiVersion: v1
+Kind: configmap
+Metadata:
+  Name: configmap
+Spec: 
+  Data:
+    Db_host: anand
+    Db_username: anand
+    Db_passwd: anand@123
+#secret.yaml
+apiVersion: v1
+Kind: secret
+Metadata:
+  Name: secret
+Spec: 
+  Data:
+    Db_host: YW5hbmQ=
+    Db_username: YW5hbmQ=
+    Db_passwd: YW5hbmRAMTIz
+ 
+The reason the application is failed is because we have not created the secrets yet. Create a new secret named db-secret with the data given below.
+You may follow any one of the methods discussed in lecture to create the secret.
+ 
+ 
+Secret Name: db-secret
+Secret 1: DB_Host=sql01
+Secret 2: DB_User=root
+Secret 3: DB_Password=password123
+ 
+kubectl create secret generic db-secret --from-literal=DB_Host=sql01 --from-literal=DB_User=root --from-literal=DB_Password=password123
+yamlfile:
+apiVersion: v1
+kind: Pod
+metadata:
+  name: multi-pod
+spec:
+  securityContext:
+    runAsUser: 1001
+  containers:
+  -  image: ubuntu
+     name: web
+     command: ["sleep", "5000"]
+     securityContext:
+      runAsUser: 1002
+ 
+  -  image: ubuntu
+     name: sidecar
+     command: ["sleep", "5000"]
+#resources
+1 means 1 cpu in aws
+Gi means gigibyte
+G means gigabyte
+ 
+ 
+ 
+OOMKilled
+The status OOMKilled indicates that it is failing because the pod ran out of memory. Identify the memory limit set on the POD.
+ 
+ 
+ Service account:
+To use service account we assign role based permissions
+Service account is to create the users in service account like we should access the pods in particular users 
+When ever we create the service account it will create also token 
+Kubectl create service account anand
+Kubectl describe serviceaccount anand
+Kubectl describe secret anand-token-kbbdm
+ 
+Creating 2 containers:
+apiVersion: v1
+kind: Pod
+metadata:
+  name: yellow
+spec:
+  containers:
+  - name: lemon
+    image: busybox
+    command:
+      - sleep
+      - "1000"
+ 
+  - name: gold
+    image: redis
+Kibana logs checking command:
+kubectl -n elastic-stack logs kibana
+Login to elk logs
+kubectl -n elastic-stack exec -it app -- cat /log/app.log
+Kubectl get pod red -o yaml > red.yaml
